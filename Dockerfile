@@ -4,11 +4,15 @@ WORKDIR /app
 
 COPY . .
 
+RUN ls -la
+
 RUN npm install
 
 FROM node:12-alpine
 
 WORKDIR /app
+
+COPY --from=build /app/* ./
 
 RUN apk add --no-cache tzdata
 
