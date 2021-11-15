@@ -23,10 +23,10 @@ npm install
 #### upload multi files
 * ```/upload-mulit-file```
 
-### show files tree
+#### show files tree
 * ```/files-tree```
 
-### compressing image
+#### compressing image
 use tinify
 
 ## License
