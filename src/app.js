@@ -8,15 +8,12 @@ const Router = require("@koa/router");
 const router = new Router();
 const multer = require("@koa/multer");
 const dirTree = require("directory-tree");
+const { compressingImage } = require('./util/file-util');
+const { fileHandle } = require('./util/file-util');
 // 不支持复杂的场景，例如form-data
 // const bodyParser = require("koa-bodyparser");
 
 app.use(KoaLogger());
-const limits = {
-  fields: 5, //非文件字段的数量
-  fileSize: 1000 * 10 * 1024, //文件大小 单位 b
-  files: 10, //文件数量
-};
 
 let port = 8086;
 // 正式地址
@@ -24,30 +21,10 @@ let host = "xxxxx";
 if (process.env.STORAGE_ENV === "local") {
   host = "http://localhost:" + port + "/";
 }
-
-const fileHandle = (req, file, cb) => {
-  let filePath = __dirname + "/upload/";
-  let type = path.extname(file.originalname);
-  const query = req._parsedUrl.query;
-  let appVal = query.split("app=")[1];
-  if (appVal) {
-    let temp = Number(appVal) === 1 ? "finance/" : "shan-m/";
-    filePath += temp;
-    if (!fs.existsSync(filePath)) {
-      fs.mkdirSync(filePath);
-    }
-    if ([".jpg", ".png", ".gif", ".jpeg", ".jfif"].includes(type)) {
-      filePath += `images/`;
-    } else if ([".pdf", ".doc", ".docx", ".xslx", ".xsl"].includes(type)) {
-      filePath += `others/`;
-    } else {
-      cb(new Error("ext is wrong"));
-    }
-    if (!fs.existsSync(filePath)) {
-      fs.mkdirSync(filePath);
-    }
-    return filePath;
-  }
+const limits = {
+  fields: 5, //非文件字段的数量
+  fileSize: 1000 * 10 * 1024, //文件大小 单位 b
+  files: 10, //文件数量
 };
 
 const storage = multer.diskStorage({
@@ -64,19 +41,6 @@ const storage = multer.diskStorage({
     cb(null, `${Date.now().toString(16)}${type}`);
   },
 });
-
-const compressingImage = (fromFile) => {
-  try {
-    const tinify = require("tinify");
-    tinify.key = "dY3G5R3NKty6M9blhdBBj1gKxHk220hs";
-    if (fromFile) {
-      const source = tinify.fromFile(fromFile);
-      source.toFile(fromFile);
-    }
-  } catch (error) {
-    console.error(error);
-  }
-};
 
 const upload = multer({ storage, limits });
 

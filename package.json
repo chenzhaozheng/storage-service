@@ -7,6 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon src/cli/start.js --app=storage",
     "start": "node src/cli/start.js --app=storage --daemon",
+    "online": "node src/cli/start.js --app=storage",
     "stop": "node src/cli/start.js --stop"
   },
   "repository": {
