@@ -1,0 +1,25 @@
+stages:
+  - install
+  - deploy
+
+install:
+  stage: install
+  only:
+    - master
+  script:
+    - cd /home/gitlab-runner/htdocs/storage-api
+    - git pull
+    - npm install
+  tags:
+    - storage-api-master-tag
+
+deploy:
+  stage: deploy
+  only:
+    - master
+  script:
+    - cd /home/gitlab-runner/htdocs/storage-api
+    - npm run stop
+    - npm run start
+  tags:
+    - storage-api-master-tag
