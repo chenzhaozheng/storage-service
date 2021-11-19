@@ -6,6 +6,8 @@ COPY . .
 
 RUN ls -la
 
+RUN npm config set registry https://registry.npm.taobao.org
+
 RUN npm install
 
 # FROM node:12-alpine

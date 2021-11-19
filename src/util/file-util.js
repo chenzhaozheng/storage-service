@@ -22,7 +22,7 @@ exports.filePathHandle = (req, file, cb) => {
     }
     if ([".jpg", ".png", ".gif", ".jpeg", ".jfif"].includes(type)) {
       filePath += `images/`;
-    } else if ([".pdf", ".doc", ".docx", ".xslx", ".xsl"].includes(type)) {
+    } else if ([".pdf", ".doc", ".docx", ".xslx", ".xsl", ".html"].includes(type)) {
       filePath += `others/`;
     } else {
       cb(new Error("ext is wrong"));
