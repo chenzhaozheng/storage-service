@@ -6,6 +6,9 @@ const fs = require("fs");
 exports.filePathHandle = (req, file, cb) => {
   try {
     let filePath = process.cwd() + "/upload/";
+    if (!fs.existsSync(filePath)) {
+      fs.mkdirSync(filePath);
+    }
     let type = path.extname(file.originalname);
     const query = req._parsedUrl.query;
     let appVal = "";
