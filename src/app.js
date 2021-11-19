@@ -16,11 +16,6 @@ const { filePathHandle } = require('./util/file-util');
 app.use(KoaLogger());
 
 let port = 8086;
-// 正式地址
-let host =  "http://xxx/";
-if (process.env.STORAGE_ENV === "local") {
-  host = "http://localhost:" + port + "/";
-}
 const limits = {
   fields: 5, //非文件字段的数量
   fileSize: 1000 * 10 * 1024, //文件大小 单位 b
@@ -64,7 +59,7 @@ router.post("/upload-single-file", async (ctx, next) => {
       return;
     }
     // 获取url这步通过切割文件名出来显示
-    let url = host + ctx.file.path.split("/upload/")[1];
+    let url = ctx.origin + '/' + ctx.file.path.split("/upload/")[1];
     let path = "/" + ctx.file.destination.split("/upload/")[1];
     let { fieldname, originalname, mimetype, filename, size } = ctx.file;
     compressingImage(ctx.file.path);
@@ -112,7 +107,7 @@ router.post("/upload-multi-file", async (ctx, next) => {
     const files = ctx.files;
     if (files && files.files) {
       files.files.forEach((file) => {
-        let url = host + file.path.split("/upload/")[1];
+        let url = ctx.origin + '/' + file.path.split("/upload/")[1];
         let path = "/" + file.destination.split("/upload/")[1];
         let { fieldname, originalname, mimetype, filename, size } = file;
         newFiles.files.push({
