@@ -42,13 +42,15 @@ class DevPlugin {
         }
       });
     } else {
+      // 非后台启动直接设置为local
+      process.env.STORAGE_ENV = 'local';
       var child = child_process.fork(require.resolve("./child"), [], {
         env: process.env,
         silent: true,
       });
-
       // fork 开启一个进程，建立与父进程的信息通道
       child.on("message", (msg) => {
+        // this.log(`msg`, msg);
         if (msg.type === "started") {
           if (msg.startSuccess && !this.started) {
             this.started = true;

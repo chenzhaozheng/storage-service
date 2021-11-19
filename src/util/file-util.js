@@ -1,17 +1,21 @@
-const path = require('path');
+const path = require("path");
 const tinify = require("tinify");
-const urlUtil = require('./url-util')
+const queryString = require("query-string");
+const fs = require("fs");
 
 exports.filePathHandle = (req, file, cb) => {
-  let filePath = __dirname + "/upload/";
-  let type = path.extname(file.originalname);
-  const query = req._parsedUrl.query;
-  let appVal = urlUtil.getQueryString("app")
-  if (appVal) {
-    let temp = Number(appVal) === 1 ? "finance/" : "shan-m/";
-    filePath += temp;
-    if (!fs.existsSync(filePath)) {
-      fs.mkdirSync(filePath);
+  try {
+    let filePath = process.cwd() + "/upload/";
+    let type = path.extname(file.originalname);
+    const query = req._parsedUrl.query;
+    let appVal = "";
+    appVal = queryString.parse(query).app;
+    if (appVal) {
+      let temp = Number(appVal) === 1 ? "finance/" : "shan-m/";
+      filePath += temp;
+      if (!fs.existsSync(filePath)) {
+        fs.mkdirSync(filePath);
+      }
     }
     if ([".jpg", ".png", ".gif", ".jpeg", ".jfif"].includes(type)) {
       filePath += `images/`;
@@ -23,7 +27,9 @@ exports.filePathHandle = (req, file, cb) => {
     if (!fs.existsSync(filePath)) {
       fs.mkdirSync(filePath);
     }
-    return filePath;
+    cb(null, filePath);
+  } catch (error) {
+    cb(new Error(error));
   }
 };
 

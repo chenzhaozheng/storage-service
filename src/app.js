@@ -9,7 +9,7 @@ const router = new Router();
 const multer = require("@koa/multer");
 const dirTree = require("directory-tree");
 const { compressingImage } = require('./util/file-util');
-const { fileHandle } = require('./util/file-util');
+const { filePathHandle } = require('./util/file-util');
 // 不支持复杂的场景，例如form-data
 // const bodyParser = require("koa-bodyparser");
 
@@ -17,7 +17,7 @@ app.use(KoaLogger());
 
 let port = 8086;
 // 正式地址
-let host = "xxxxx";
+let host =  "http://xxx/";
 if (process.env.STORAGE_ENV === "local") {
   host = "http://localhost:" + port + "/";
 }
@@ -31,8 +31,7 @@ const storage = multer.diskStorage({
   //文件保存路径
   destination: function (req, file, cb) {
     console.log(file);
-    let filePath = fileHandle(req, file, cb);
-    cb(null, filePath);
+    filePathHandle(req, file, cb);
   },
   //修改文件名称
   filename: function (req, file, cb) {
@@ -53,15 +52,21 @@ router.post("/upload-single-file", async (ctx, next) => {
     ctx.body = {
       code: 0,
       msg: err.message,
+      dirname: __dirname,
+      process: process.env,
     };
   } else {
-    console.log("ctx.file", ctx.file);
-    console.log("process.env", process.env);
-    let url = host + ctx.file.path.split(__dirname + "/upload/")[1];
-    let path = "/" + ctx.file.destination.split(__dirname + "/upload/")[1];
+    if (!ctx.file) {
+      ctx.body = {
+        code: 0,
+        msg: '没有检测到文件'
+      }
+      return;
+    }
+    // 获取url这步通过切割文件名出来显示
+    let url = host + ctx.file.path.split("/upload/")[1];
+    let path = "/" + ctx.file.destination.split("/upload/")[1];
     let { fieldname, originalname, mimetype, filename, size } = ctx.file;
-
-    // console.log(ctx.file.path);
     compressingImage(ctx.file.path);
     ctx.body = {
       code: 1,
@@ -94,21 +99,21 @@ router.post("/upload-multi-file", async (ctx, next) => {
       msg: err.message,
     };
   } else {
+    if (!ctx.files) {
+      ctx.body = {
+        code: 0,
+        msg: '没有检测到文件'
+      }
+      return;
+    }
     let newFiles = {
       files: [],
     };
     const files = ctx.files;
-    console.log("files", files);
     if (files && files.files) {
       files.files.forEach((file) => {
-        // let url =
-        //   ctx.request.protocol +
-        //   "://" +
-        //   ctx.request.host +
-        //   "/" +
-        //   file.path.split(__dirname + "/upload/")[1];
-        let url = host + file.path.split(__dirname + "/upload/")[1];
-        let path = "/" + file.destination.split(__dirname + "/upload/")[1];
+        let url = host + file.path.split("/upload/")[1];
+        let path = "/" + file.destination.split("/upload/")[1];
         let { fieldname, originalname, mimetype, filename, size } = file;
         newFiles.files.push({
           fieldname,
@@ -174,10 +179,10 @@ router.get("/files-tree", async (ctx, next) => {
   ctx.body = filteredTree;
 })
 
-app.use(static(path.join(__dirname, "/upload")));
+app.use(static(path.join(__dirname, "/../upload")));
 app.use(router.routes()).use(router.allowedMethods());
 app.on("error", (err) => {
   console.error("server error", err);
 });
-process.send({ type: 'port', port});
+// process.send({ type: 'port', port});
 app.listen(port);

@@ -8,17 +8,17 @@ RUN ls -la
 
 RUN npm install
 
-FROM node:12-alpine
+# FROM node:12-alpine
 
-WORKDIR /app
+# WORKDIR /app
 
-COPY --from=build /app/* ./
+# COPY --from=build /app/* ./
 
-RUN apk add --no-cache tzdata
+# RUN apk add --no-cache tzdata
 
 ENV TZ="Asia/Shanghai"
 
-RUN npm install
+# RUN npm install
 
 EXPOSE 8086
 
