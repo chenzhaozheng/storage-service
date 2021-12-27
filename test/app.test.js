@@ -1,16 +1,16 @@
 /* mocha */
-var assert = require("assert");
+// var assert = require("assert");
 
-describe("Stoarge Api Test", function () {
-  beforeEach(function (done) {});
+describe("test/app.test.js",  () => {
+  // beforeEach(function (done) {});
 
-  afterEach(function (done) {});
+  // afterEach(function (done) {});
 
-  it("shound post file to local path", function (done) {
-    assert(1, 1);
+  it("shound post file to local path", async (done) => {
+    expect(3).toBe(3);
   });
 
-  it("shound post files to local path", function (done) {});
+  it("shound post files to local path", async (done) => {});
 
-  it("shound get files-tree json", function(done) {})
+  it("shound get files-tree json", async(done) => {})
 });

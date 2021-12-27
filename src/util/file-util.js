@@ -2,8 +2,9 @@ const path = require("path");
 const tinify = require("tinify");
 const queryString = require("query-string");
 const fs = require("fs");
+const multer = require("@koa/multer");
 
-exports.filePathHandle = (req, file, cb) => {
+const filePathHandle = (req, file, cb) => {
   try {
     let filePath = process.cwd() + "/upload/";
     if (!fs.existsSync(filePath)) {
@@ -36,7 +37,7 @@ exports.filePathHandle = (req, file, cb) => {
   }
 };
 
-exports.compressingImage = (fromFile) => {
+const  compressingImage = (fromFile) => {
   try {
     tinify.key = "dY3G5R3NKty6M9blhdBBj1gKxHk220hs";
     if (fromFile) {
@@ -47,3 +48,29 @@ exports.compressingImage = (fromFile) => {
     console.error(error);
   }
 };
+
+const limits = {
+  fields: 5, //非文件字段的数量
+  fileSize: 1000 * 10 * 1024, //文件大小 单位 b
+  files: 10, //文件数量
+};
+
+const storage = multer.diskStorage({
+  //文件保存路径
+  destination: function (req, file, cb) {
+    console.log(file);
+    filePathHandle(req, file, cb);
+  },
+  //修改文件名称
+  filename: function (req, file, cb) {
+    // let type = file.originalname.split('.')[1]
+    let type = path.extname(file.originalname);
+    cb(null, `${Date.now().toString(16)}${type}`);
+  },
+});
+
+const upload  = multer({ storage, limits });
+
+exports.upload = upload;
+exports.filePathHandle = filePathHandle;
+exports.compressingImage = compressingImage;

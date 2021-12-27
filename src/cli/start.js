@@ -14,6 +14,7 @@ class DevPlugin {
     const isDaemon = this.argv.daemon;
 
     if (isDaemon) {
+      process.env.STORAGE_ENV = 'pro';
       const [ stdout, stderr ] = await [ await helper.getRotatelog('logs/main-stdout'), await helper.getRotatelog('logs/main-stderr')];
       var child = child_process.fork(require.resolve("./child"), [], {
         env: process.env,
@@ -59,7 +60,7 @@ class DevPlugin {
         } else if (msg.type === "port") {
           this.log(`[http://127.0.0.1:${msg.port}]`);
         }else if (msg.type === "error") {
-          console.error(chalk.hex("#ff00000")(`[ Storage ] ${msg}`));
+          console.error(chalk.hex("#ff00000")(`[ Storage ] ${JSON.stringify(msg)}`));
         }
       });
     }
@@ -75,13 +76,16 @@ class DevPlugin {
       this.log(`close 子进程退出，退出码${code}`);
     });
     child.on("error", (err) => {
-      this.log(`error ${err}`);
+      this.log(`error`);
+      this.log(err);
     });
     child.on("exit", (err, signal) => {
-      this.log(`exit ${err} ${signal}`);
+      this.log(`exit ${signal}`);
+      this.log(err);
     });
     child.on("disconnect", (err, signal) => {
-      this.log(`disconnect ${err} ${signal}`);
+      this.log(`disconnect ${signal}`);
+      this.log(err);
     });
   }
 
