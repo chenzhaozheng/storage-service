@@ -1,0 +1,9 @@
+version: '3'
+services:
+  storage-pro:
+    container_name: storage-pro
+    image: storage-pro
+    volumes:
+      - ~/storage-pro/upload:/app/upload
+    ports:
+      - '9309:7001'
